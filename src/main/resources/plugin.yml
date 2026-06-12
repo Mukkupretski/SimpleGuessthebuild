@@ -3,5 +3,15 @@ version: 1.0
 main: com.example.myplugin.MyPlugin
 api-version: '26.1.2'
 commands:
-  hello:
-    description: Says hello
+  setarea:
+    description: Set the play area
+  aihe:
+    description: Lisää tai poista aihe
+  liity:
+    description: Liity peliin
+  poistu:
+    description: Poistu pelistä
+  aloita:
+    description: Aloita peli
+  lopeta:
+    description: Lopeta peli

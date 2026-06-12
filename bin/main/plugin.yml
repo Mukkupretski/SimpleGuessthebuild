@@ -7,11 +7,4 @@ commands:
     description: Set the play area
   aihe:
     description: Lisää tai poista aihe
-  liity:
-    description: Liity peliin
-  poistu:
-    description: Poistu pelistä
-  aloita:
-    description: Aloita peli
-  lopeta:
-    description: Lopeta peli
+ 
