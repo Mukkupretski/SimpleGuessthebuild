@@ -1,9 +1,10 @@
 package com.example.myplugin.Listeners;
 
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import com.example.myplugin.MyPlugin;
 import com.example.myplugin.Managers.GameManager;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
@@ -13,8 +14,14 @@ public class MessageListener implements Listener {
 
   @EventHandler
   public void onMessage(AsyncChatEvent event) {
-    Player player = event.getPlayer();
     String guess = PlainTextComponentSerializer.plainText().serialize(event.message());
-    GameManager.getInstance().SendGuess(player, guess);
+
+    if (!GameManager.getInstance().ValidateGuess(event.getPlayer(), guess)) {
+      return;
+    }
+    event.setCancelled(true);
+    Bukkit.getScheduler().runTask(MyPlugin.getInstance(), () -> {
+      GameManager.getInstance().CorrectGuess(event.getPlayer(), guess);
+    });
   }
 }

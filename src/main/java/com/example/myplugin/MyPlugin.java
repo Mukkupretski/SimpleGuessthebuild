@@ -10,6 +10,7 @@ import com.example.myplugin.Commands.Join;
 import com.example.myplugin.Commands.Leave;
 import com.example.myplugin.Commands.SetArea;
 import com.example.myplugin.Commands.Start;
+import com.example.myplugin.Listeners.LeaveListener;
 import com.example.myplugin.Listeners.MenuListener;
 import com.example.myplugin.Listeners.MessageListener;
 
@@ -23,6 +24,9 @@ public class MyPlugin extends JavaPlugin {
 
   // TODO: ADD LISTENERS HERE
   private void AddEvents() {
+    getServer().getPluginManager().registerEvents(
+        new LeaveListener(),
+        this);
     getServer().getPluginManager().registerEvents(
         new MenuListener(),
         this);

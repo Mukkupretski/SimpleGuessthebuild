@@ -61,7 +61,7 @@ public class GameManager {
   }
 
   public void StartGame() {
-    if (pelinTila != States.POIS)
+    if (pelinTila != States.POIS || players.size() == 0)
       return;
     guessedCorrectly = new HashSet<>();
 
@@ -71,17 +71,23 @@ public class GameManager {
       playersLeft.add(uuid);
       SetScore(uuid, 0);
     }
-    NextPlayerTurn();
+    SetState(States.BUILDING);
   }
 
   // remove all players
   // reset everything
   // FIXME: ANNOUNCE WINNER
+  public void ClearStuffAtEnd() {
+    Timer.getInstance().SetTime(0);
+    SetEvent("Peli päättyi");
+  }
+
   public void EndGame() {
+    ClearStuffAtEnd();
     Broadcast.BroadcastMessage("Peli päättyi");
     for (UUID uuid : players) {
       Player player = Bukkit.getPlayer(uuid);
-      player.playSound(player.getLocation(), Sound.MUSIC_DISC_TEARS, SoundCategory.MUSIC, 1f, 1f);
+      player.playSound(player.getLocation(), Sound.MUSIC_DISC_TEARS, SoundCategory.RECORDS, 100f, 1f);
 
     }
   }
@@ -148,6 +154,7 @@ public class GameManager {
         } else {
           SetState(States.ODOTUS);
         }
+        break;
       case States.POIS:
         break;
     }
@@ -219,7 +226,6 @@ public class GameManager {
         SetEvent(ChatColor.GREEN + Bukkit.getPlayer(playerInTurn).getName() + ChatColor.WHITE + " rakentaa");
         break;
       case States.POIS:
-        SetEvent("Peli päättyi");
         EndGame();
         break;
     }
@@ -239,23 +245,31 @@ public class GameManager {
     }
   }
 
-  public void SendGuess(Player player, String guess) {
+  public boolean ValidateGuess(Player player, String guess) {
+
     if (!Guesstime || sana == "")
-      return;
+      return false;
     UUID uuid = player.getUniqueId();
     if (!players.contains(uuid))
-      return;
+      return false;
     if (guessedCorrectly.contains(uuid) || playerInTurn == uuid)
-      return;
+      return false;
     if (!guess.equalsIgnoreCase(sana))
-      return;
+      return false;
+    return true;
+  }
+
+  public void CorrectGuess(Player player, String guess) {
     if (guessedCorrectly.isEmpty()) {
       SetScore(playerInTurn, GetScore(playerInTurn) + 3);
     }
-    int scoreToAdd = Math.max(1, guessedCorrectly.size());
+    int scoreToAdd = Math.max(1, 3 - guessedCorrectly.size());
     SetScore(player.getUniqueId(), GetScore(playerInTurn) + scoreToAdd);
     player.sendMessage("Sana oli " + ChatColor.GOLD + sana);
+    Broadcast.BroadcastMessage(ChatColor.YELLOW + player.getName() + ChatColor.WHITE + " arvasi sanan");
     guessedCorrectly.add(player.getUniqueId());
+    int playerCount = players.size();
+    Timer.getInstance().RemoveTime(Math.floorDiv(time, playerCount + 1));
 
   }
 }
